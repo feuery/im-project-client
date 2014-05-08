@@ -8,4 +8,6 @@
                  [seesaw "1.4.4"]
                  [clj-time "0.5.1"]
                  [http-kit "2.1.17"]
-                 [fontselector "1.0.0"]])
+                 [fontselector "1.0.0"]]
+  :aot [mese-client.core]
+  :main mese-client.core)

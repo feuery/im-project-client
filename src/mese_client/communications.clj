@@ -1,18 +1,16 @@
 (ns mese-client.communications
   (:require [mese-client.settings :refer [get-setting]]
-            [mese-client.friends :refer [get-current-users]]
+            [mese-client.friends :refer [get-current-users get-ip]]
             [mese-client.util :refer [in?]]
             [org.httpkit.client :as http]
             [clj-time.core :as time]
             [clj-time.coerce :as tc]))
 
-(defn get-ip []
-  (:body @(http/get "http://prong.arkku.net/whatismyip.php")))
 
 (defn login
   "Returns false on failure, session-id on success."
   [username password current-user-atom]
-  (let [url (str (get-setting :server-url) "login/" username "/" password)]
+  (let [url (str (get-setting :server-url) "login/" username "/" password "/" (get-ip) )]
     (println "url: " url)
     (if-let [{body :body :as result} @(http/get url)]
       (do
@@ -46,10 +44,10 @@
                 message]
   (let [{message :message receiver :receiver} message
         options {:form-params {:message message}}]
-    @(http/post (str (get-setting :server-url) "send-msg/" session-id "/receiver-handle/" receiver) options)))
+    @(http/post (str (get-setting :server-url) "send-msg/" session-id "/receiver-handle/" receiver "/" (get-ip)) options)))
 
 (defn get-inbox [session-id]
-  (let [{body :body} @(http/get (str (get-setting :server-url) "inbox/" session-id "/"))]
+  (let [{body :body} @(http/get (str (get-setting :server-url) "inbox/" session-id "/" (get-ip) "/"))]
     (println body)
     (when-let [{success :success :as result} (read-string body)] ;;unreadable DateTime-literals fuck this up
       (if success

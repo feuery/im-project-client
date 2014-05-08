@@ -4,8 +4,11 @@
             [mese-client.util :refer [in?]]                        
             [mese-client.settings :refer [get-setting]]))
 
+(defn get-ip []
+  (:body @(http/get "http://prong.arkku.net/whatismyip.php")))
+
 (defn get-current-users [session-id]
-  (let [{body :body :as result} @(http/get (str (get-setting :server-url) "list-friends/" session-id))]
+  (let [{body :body :as result} @(http/get (str (get-setting :server-url) "list-friends/" session-id "/" (get-ip)))]
     ;; (println "Results: ")
     ;; (pprint result)
     ;(println "@get-current-users: body: " body)
@@ -19,7 +22,7 @@
           result)))))
 
 (defn get-friend-requests [session-id]
-  (let [{body :body :as result} @(http/get (str (get-setting :server-url) "friend-requests/" session-id))]
+  (let [{body :body :as result} @(http/get (str (get-setting :server-url) "friend-requests/" session-id "/" (get-ip)))]
     (println "result@get-friend-requests: " result)
     (if-let [result (read-string body)]
       (if (:success result)
@@ -28,7 +31,7 @@
       false)))
 
 (defn send-request [session-id friend-handle]
-  (let [{body :body :as result} @(http/get (str (get-setting :server-url) "friend-request/" session-id "/" friend-handle))]
+  (let [{body :body :as result} @(http/get (str (get-setting :server-url) "friend-request/" session-id "/" friend-handle "/" (get-ip)))]
     (println "result@send-request: " result)
     (if-let [result (read-string body)]
       (if (and (map? result)
@@ -40,7 +43,7 @@
 
 (defn accept-request [session-id requester-handle]
   (println "Accepting " requester-handle)
-  (let [url (str (get-setting :server-url) "accept-request/" session-id "/" requester-handle)]
+  (let [url (str (get-setting :server-url) "accept-request/" session-id "/" requester-handle "/" (get-ip))]
     (println "url: " url)
     (let [{body :body :as result} @(http/get url)]
       (println "result@accept-request: " body)
@@ -52,7 +55,7 @@
         false))))
 
 (defn update-myself [sessid userhandle property value]
-  (let [url (str (get-setting :server-url) "update-myself/" sessid "/" userhandle "/")
+  (let [url (str (get-setting :server-url) "update-myself/" sessid "/" userhandle "/" (get-ip) "/")
         options {:form-params {:property property :new-value value}}]
     (println "Url: " url " | userhandle: " userhandle)
     (when-let [{body :body :as result} @(http/post url options)]

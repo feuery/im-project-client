@@ -6,14 +6,8 @@
                                          update-font]]
             [mese-client.communications :refer [login]]
             [mese-client.util :refer [map-to-values
-                                    in?]]))
-
-(native!)
-
-;;TODO Remove from published versions...
-
- (when (= (System/getProperty "os.name") "Linux")
-  (javax.swing.UIManager/setLookAndFeel "com.sun.java.swing.plaf.gtk.GTKLookAndFeel")) ;;Because Swing is ugly on KDE without this
+                                    in?]])
+  (:gen-class))
 
 (def current-user (atom nil :validator
                         #(or (nil? %)
@@ -25,6 +19,13 @@
        (filter #(not (= (get map1 %) (get map2 %))))))                                   
  
 (defn -main [& argh]
+  (native!)
+
+  ;;TODO Remove from published versions...
+
+  (when (= (System/getProperty "os.name") "Linux")
+    (javax.swing.UIManager/setLookAndFeel "com.sun.java.swing.plaf.gtk.GTKLookAndFeel")) ;;Because Swing is ugly on KDE without this
+
 ;((fn main [] 
   (let [login-map (get-credentsials)]
     (comment     {:username username
